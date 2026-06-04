@@ -80,26 +80,57 @@
   /* ── MAIN ── */
   main{flex:1;padding:28px 32px;background:radial-gradient(ellipse 60% 40% at 100% 0%,rgba(249,115,22,.06) 0%,transparent 60%),var(--bg);min-height:calc(100vh - 64px);}
 
-  /* ── UPLOAD ZONE ── */
-  #uploadZone{background:var(--surface);border:2px dashed var(--border);border-radius:12px;padding:24px;margin-bottom:24px;display:none;transition:border-color .2s;}
-  #uploadZone.drag-over{border-color:var(--accent);background:rgba(249,115,22,.04);}
-  #uploadZone h3{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;margin-bottom:16px;}
-  .upload-form{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;}
-  .upload-form input[type="text"],.upload-form select{background:var(--surface2);border:1px solid var(--border);
-    border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:'Barlow',sans-serif;}
-  .upload-form input[type="text"]:focus,.upload-form select:focus{outline:none;border-color:var(--accent);}
-  .upload-form input[type="text"]{flex:1;min-width:200px;}
-  .file-drop-area{border:1.5px dashed var(--border);border-radius:8px;padding:9px 14px;cursor:pointer;
-    display:flex;align-items:center;gap:8px;background:var(--surface2);font-size:13px;color:var(--muted);
-    transition:border-color .2s;min-width:180px;}
-  .file-drop-area:hover{border-color:var(--accent);color:var(--text);}
-  .file-drop-area input[type="file"]{display:none;}
-  .btn-upload{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 18px;
-    font-size:13px;font-weight:600;font-family:'Barlow',sans-serif;cursor:pointer;transition:background .2s;white-space:nowrap;}
-  .btn-upload:hover{background:var(--accent2);} .btn-upload:disabled{opacity:.5;cursor:not-allowed;}
-  .upload-progress{margin-top:12px;display:none;}
-  .progress-bar-wrap{background:var(--surface2);border-radius:4px;height:5px;overflow:hidden;margin-top:5px;}
-  .progress-bar{height:100%;background:var(--accent);border-radius:4px;width:0%;transition:width .3s;}
+  /* ── UPLOAD ZONE MODERNE ── */
+  #uploadZone{margin-bottom:28px;display:none;}
+  .upload-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .upload-header h3{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;
+    letter-spacing:.5px;display:flex;align-items:center;gap:9px;}
+  .upload-header h3 span.utag{background:rgba(249,115,22,.15);color:var(--accent);border:1px solid rgba(249,115,22,.3);
+    font-size:11px;padding:2px 8px;border-radius:20px;font-family:'Barlow',sans-serif;font-weight:600;letter-spacing:.5px;}
+
+  /* Drop target grande zone */
+  .drop-target{border:2px dashed var(--border);border-radius:14px;background:var(--surface);
+    padding:32px 24px;text-align:center;cursor:pointer;transition:all .25s;position:relative;margin-bottom:16px;}
+  .drop-target:hover,.drop-target.drag-over{border-color:var(--accent);background:rgba(249,115,22,.05);}
+  .drop-target input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+  .drop-icon{font-size:36px;margin-bottom:10px;display:block;}
+  .drop-label{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px;}
+  .drop-sub{font-size:12px;color:var(--muted);}
+  .drop-target.has-file{border-color:var(--green);background:rgba(63,185,80,.05);}
+  .drop-target.has-file .drop-icon{font-size:28px;}
+  .file-preview{display:none;align-items:center;gap:12px;justify-content:center;}
+  .file-preview-icon{width:44px;height:44px;background:rgba(248,81,73,.15);border:1px solid rgba(248,81,73,.3);
+    border-radius:8px;display:grid;place-items:center;font-size:20px;flex-shrink:0;}
+  .file-preview-info{text-align:left;}
+  .file-preview-name{font-size:13px;font-weight:600;color:var(--text);}
+  .file-preview-size{font-size:11px;color:var(--muted);margin-top:2px;}
+
+  /* Formulaire métadonnées */
+  .upload-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+  .upload-meta input,.upload-meta select{background:var(--surface2);border:1px solid var(--border);
+    border-radius:9px;padding:11px 14px;color:var(--text);font-size:13px;font-family:'Barlow',sans-serif;
+    transition:border-color .2s,box-shadow .2s;width:100%;}
+  .upload-meta input:focus,.upload-meta select:focus{outline:none;border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(249,115,22,.12);}
+  .upload-meta .span2{grid-column:span 2;}
+  .upload-meta .span3{grid-column:span 3;}
+
+  /* Bouton publier */
+  .btn-publish{width:100%;background:linear-gradient(135deg,#f97316,#fb923c);color:#fff;border:none;
+    border-radius:10px;padding:14px;font-size:15px;font-weight:700;font-family:'Barlow Condensed',sans-serif;
+    letter-spacing:1px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .btn-publish:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(249,115,22,.35);}
+  .btn-publish:active{transform:scale(.98);}
+  .btn-publish:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;}
+
+  /* Progress moderne */
+  .upload-progress{margin-top:14px;display:none;background:var(--surface2);border:1px solid var(--border);
+    border-radius:10px;padding:14px 16px;}
+  .progress-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .progress-label{font-size:13px;font-weight:600;color:var(--text);}
+  .progress-pct{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:var(--accent);}
+  .progress-bar-wrap{background:rgba(255,255,255,.06);border-radius:6px;height:7px;overflow:hidden;}
+  .progress-bar{height:100%;background:linear-gradient(90deg,#f97316,#fb923c);border-radius:6px;width:0%;transition:width .3s;}
 
   /* ── FILTRES RAPIDES ── */
   .filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
@@ -532,19 +563,40 @@
     <main>
       <!-- UPLOAD (admin) -->
       <div id="uploadZone">
-        <h3>📤 Ajouter un manuel</h3>
-        <div class="upload-form">
-          <input type="text" id="upTitle" placeholder="Titre du manuel (ex: PDR Soutireuse Sidel)"/>
+        <div class="upload-header">
+          <h3>📤 Ajouter un manuel <span class="utag">ADMIN</span></h3>
+        </div>
+
+        <!-- Zone drag & drop -->
+        <div class="drop-target" id="dropTarget" onclick="document.getElementById('upFile').click()">
+          <input type="file" id="upFile" accept=".pdf,.doc,.docx,.xlsx,.png,.jpg" style="display:none"/>
+          <div id="dropDefault">
+            <span class="drop-icon">📂</span>
+            <div class="drop-label">Glissez votre fichier ici</div>
+            <div class="drop-sub">ou cliquez pour parcourir · PDF, DOCX, XLSX acceptés</div>
+          </div>
+          <div class="file-preview" id="filePreview">
+            <div class="file-preview-icon" id="filePreviewIcon">📕</div>
+            <div class="file-preview-info">
+              <div class="file-preview-name" id="filePreviewName">—</div>
+              <div class="file-preview-size" id="filePreviewSize">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Métadonnées -->
+        <div class="upload-meta">
+          <input type="text" id="upTitle" class="span3" placeholder="📝  Titre du manuel (ex: Catalogue PDR Soutireuse Sidel)"/>
           <select id="upMetier">
-            <option value="">-- Métier --</option>
+            <option value="">🏷️ Métier…</option>
             <option value="maintenance">🔧 Maintenance</option>
             <option value="operateur">⚙️ Opérateurs</option>
             <option value="mecanicien">🪛 Mécaniciens</option>
             <option value="electrique">⚡ Électrique</option>
             <option value="general">📄 Général</option>
           </select>
-          <select id="upMachine">
-            <option value="">-- Machine --</option>
+          <select id="upMachine" class="span2">
+            <option value="">⚙️ Machine concernée…</option>
             <option value="souffleuse">💨 Souffleuse</option>
             <option value="rinceuse">🚿 Rinceuse</option>
             <option value="soutireuse">🍶 Soutireuse</option>
@@ -552,14 +604,17 @@
             <option value="emballage">📦 Emballage</option>
             <option value="palletizing">🏗️ Palletizing</option>
           </select>
-          <label class="file-drop-area" id="fileLabel">
-            <span>📎</span><span id="fileName">Cliquer ou glisser un fichier…</span>
-            <input type="file" id="upFile" accept=".pdf,.doc,.docx,.xlsx,.png,.jpg"/>
-          </label>
-          <button class="btn-upload" id="btnUpload" onclick="uploadManual()">Publier</button>
         </div>
+
+        <button class="btn-publish" id="btnUpload" onclick="uploadManual()">
+          ⬆️ PUBLIER LE MANUEL
+        </button>
+
         <div class="upload-progress" id="upProgress">
-          <div style="font-size:12px;color:var(--muted)" id="upProgressText">Envoi…</div>
+          <div class="progress-top">
+            <span class="progress-label" id="upProgressText">Envoi en cours…</span>
+            <span class="progress-pct" id="upProgressPct">0%</span>
+          </div>
           <div class="progress-bar-wrap"><div class="progress-bar" id="upBar"></div></div>
         </div>
       </div>
@@ -827,7 +882,8 @@ async function uploadManual() {
       snap => {
         const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
         bar.style.width = pct + "%";
-        progTxt.textContent = `Envoi… ${pct}%`;
+        progTxt.textContent = pct < 100 ? "Envoi en cours…" : "Finalisation…";
+        document.getElementById("upProgressPct").textContent = pct + "%";
       },
       err => { showToast("❌ " + err.message,"error"); resetBtn(btn); },
       async () => {
@@ -838,19 +894,23 @@ async function uploadManual() {
           url, storagePath: task.snapshot.ref.fullPath,
           uploadedBy: currentUser.email, createdAt: new Date()
         });
-        showToast("✅ Manuel publié !", "success");
-        document.getElementById("upTitle").value  = "";
-        document.getElementById("upMetier").value = "";
-        document.getElementById("upMachine").value= "";
-        document.getElementById("upFile").value   = "";
-        document.getElementById("fileName").textContent = "Cliquer ou glisser un fichier…";
+        showToast("✅ Manuel publié avec succès !", "success");
+        document.getElementById("upTitle").value   = "";
+        document.getElementById("upMetier").value  = "";
+        document.getElementById("upMachine").value = "";
+        document.getElementById("upFile").value    = "";
+        // Reset drop zone
+        document.getElementById("dropDefault").style.display = "block";
+        document.getElementById("filePreview").style.display = "none";
+        document.getElementById("dropTarget").classList.remove("has-file");
+        document.getElementById("upProgressPct").textContent = "0%";
         resetBtn(btn);
         prog.style.display = "none"; bar.style.width = "0%";
       }
     );
   } catch(e) { showToast("❌ " + e.message,"error"); resetBtn(btn); }
 }
-function resetBtn(btn) { btn.disabled = false; btn.innerHTML = "Publier"; }
+function resetBtn(btn) { btn.disabled = false; btn.innerHTML = "⬆️ PUBLIER LE MANUEL"; }
 
 /* ══ SUPPRESSION ══ */
 async function deleteManual(id, storagePath, e) {
@@ -990,23 +1050,40 @@ function openPdf(url) {
 }
 function closeModal() {}
 
-/* ══ FILE INPUT ══ */
+/* ══ FILE INPUT & DRAG DROP MODERNES ══ */
+
+function previewFile(f) {
+  if (!f) return;
+  const dt = document.getElementById("dropTarget");
+  const isPdf = f.name.toLowerCase().endsWith(".pdf");
+  document.getElementById("filePreviewIcon").textContent = isPdf ? "📕" : "📄";
+  document.getElementById("filePreviewName").textContent = f.name;
+  document.getElementById("filePreviewSize").textContent = formatSize(f.size) + " · " + f.type;
+  document.getElementById("dropDefault").style.display = "none";
+  document.getElementById("filePreview").style.display = "flex";
+  dt.classList.add("has-file");
+
+  // Auto-remplir le titre depuis le nom du fichier
+  const titleField = document.getElementById("upTitle");
+  if (!titleField.value) {
+    titleField.value = f.name.replace(/\.[^.]+$/, "").replace(/[_-]/g, " ").replace(/\s+/g, " ").trim();
+  }
+}
+
 document.getElementById("upFile").addEventListener("change", function() {
-  const f = this.files[0];
-  document.getElementById("fileName").textContent = f ? f.name : "Cliquer ou glisser un fichier…";
+  if (this.files[0]) previewFile(this.files[0]);
 });
 
-/* ══ DRAG & DROP ══ */
-const uz = document.getElementById("uploadZone");
-uz.addEventListener("dragover",  e => { e.preventDefault(); uz.classList.add("drag-over"); });
-uz.addEventListener("dragleave", () => uz.classList.remove("drag-over"));
-uz.addEventListener("drop", e => {
-  e.preventDefault(); uz.classList.remove("drag-over");
+const dt = document.getElementById("dropTarget");
+dt.addEventListener("dragover",  e => { e.preventDefault(); dt.classList.add("drag-over"); });
+dt.addEventListener("dragleave", () => dt.classList.remove("drag-over"));
+dt.addEventListener("drop", e => {
+  e.preventDefault(); dt.classList.remove("drag-over");
   const f = e.dataTransfer.files[0];
   if (f) {
-    const dt = new DataTransfer(); dt.items.add(f);
-    document.getElementById("upFile").files = dt.files;
-    document.getElementById("fileName").textContent = f.name;
+    const dtr = new DataTransfer(); dtr.items.add(f);
+    document.getElementById("upFile").files = dtr.files;
+    previewFile(f);
   }
 });
 
