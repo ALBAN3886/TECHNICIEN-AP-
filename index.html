@@ -897,30 +897,59 @@ async function uploadManual() {
         progTxt.textContent = pct < 100 ? "Envoi en cours…" : "Finalisation…";
         document.getElementById("upProgressPct").textContent = pct + "%";
       },
-      err => { showToast("❌ " + err.message,"error"); resetBtn(btn); },
-      async () => {
-        const url = await getDownloadURL(task.snapshot.ref);
-        await addDoc(collection(db, "manuals"), {
-          title, metier, machine,
-          fileName: file.name, fileType: file.type, fileSize: file.size,
-          url, storagePath: task.snapshot.ref.fullPath,
-          uploadedBy: currentUser.email, createdAt: new Date()
-        });
-        showToast("✅ Manuel publié avec succès !", "success");
-        document.getElementById("upTitle").value   = "";
-        document.getElementById("upMetier").value  = "";
-        document.getElementById("upMachine").value = "";
-        document.getElementById("upFile").value    = "";
-        // Reset drop zone
-        document.getElementById("dropDefault").style.display = "block";
-        document.getElementById("filePreview").style.display = "none";
-        document.getElementById("dropTarget").classList.remove("has-file");
-        document.getElementById("upProgressPct").textContent = "0%";
+      err => {
+        // Erreur Storage — afficher le code précis
+        const storageErrs = {
+          "storage/unauthorized": "❌ Accès refusé au Storage. Vérifiez les règles Firebase Storage.",
+          "storage/canceled": "❌ Upload annulé.",
+          "storage/quota-exceeded": "❌ Quota Storage dépassé.",
+          "storage/invalid-checksum": "❌ Fichier corrompu lors du transfert.",
+          "storage/retry-limit-exceeded": "❌ Connexion trop lente ou instable. Réessayez."
+        };
+        const msg = storageErrs[err.code] || ("❌ Storage: " + (err.code || err.message));
+        showToast(msg, "error");
+        progTxt.textContent = msg;
+        prog.style.background = "rgba(248,81,73,0.1)";
         resetBtn(btn);
-        prog.style.display = "none"; bar.style.width = "0%";
+      },
+      async () => {
+        try {
+          const url = await getDownloadURL(task.snapshot.ref);
+          await addDoc(collection(db, "manuals"), {
+            title, metier, machine,
+            fileName: file.name, fileType: file.type, fileSize: file.size,
+            url, storagePath: task.snapshot.ref.fullPath,
+            uploadedBy: currentUser.email, createdAt: new Date()
+          });
+          showToast("✅ Manuel publié avec succès !", "success");
+          document.getElementById("upTitle").value   = "";
+          document.getElementById("upMetier").value  = "";
+          document.getElementById("upMachine").value = "";
+          document.getElementById("upFile").value    = "";
+          document.getElementById("dropDefault").style.display = "block";
+          document.getElementById("filePreview").style.display = "none";
+          document.getElementById("dropTarget").classList.remove("has-file");
+          document.getElementById("upProgressPct").textContent = "0%";
+          resetBtn(btn);
+          prog.style.display = "none"; bar.style.width = "0%";
+        } catch(firestoreErr) {
+          // Fichier uploadé dans Storage mais Firestore a échoué
+          const fsErrs = {
+            "permission-denied": "❌ Firestore: permission refusée. Vérifiez les règles Firestore.",
+            "unavailable": "❌ Firestore indisponible. Vérifiez votre connexion."
+          };
+          const msg = fsErrs[firestoreErr.code] || ("❌ Firestore: " + (firestoreErr.code || firestoreErr.message));
+          showToast(msg, "error");
+          progTxt.textContent = msg;
+          resetBtn(btn);
+        }
       }
     );
-  } catch(e) { showToast("❌ " + e.message,"error"); resetBtn(btn); }
+  } catch(e) {
+    showToast("❌ " + (e.code || e.message), "error");
+    resetBtn(btn);
+    prog.style.display = "none";
+  }
 }
 function resetBtn(btn) { btn.disabled = false; btn.innerHTML = "⬆️ PUBLIER LE MANUEL"; }
 
