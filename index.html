@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AP Industrie — Bibliothèque des Manuels</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:#0d1117; --surface:#161b22; --surface2:#1c2330;
+    --border:#30363d; --accent:#f97316; --accent2:#fb923c;
+    --text:#e6edf3; --muted:#7d8590; --green:#3fb950;
+    --red:#f85149; --blue:#58a6ff; --yellow:#d2a122; --purple:#a371f7;
+    --radius:10px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+  ::-webkit-scrollbar{width:6px;} ::-webkit-scrollbar-track{background:var(--bg);} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+  /* ── LOGIN ── */
+  #loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;position:relative;overflow:hidden;background:transparent;}
+    position:relative;overflow:hidden;background:#1a2332;}
+  .login-card{background:transparent;border:none;border-radius:16px;padding:48px 40px 40px;
+    width:100%;max-width:420px;box-shadow:none;animation:fadeUp .5s ease;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .login-logo{display:flex;align-items:center;gap:12px;margin-bottom:32px;}
+  .logo-icon{width:48px;height:48px;background:var(--accent);border-radius:10px;display:grid;place-items:center;font-size:22px;flex-shrink:0;}
+  .logo-text h1{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;letter-spacing:.5px;line-height:1.1;}
+  .logo-text span{font-size:12px;color:var(--muted);font-weight:400;letter-spacing:1px;text-transform:uppercase;}
+  .login-title{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;margin-bottom:6px;}
+  .login-sub{font-size:14px;color:var(--muted);margin-bottom:32px;}
+  .field{margin-bottom:18px;}
+  .field label{display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:7px;letter-spacing:.4px;}
+  .field input{width:100%;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.25);border-radius:var(--radius);
+    padding:12px 14px;font-size:15px;color:var(--text);font-family:'Barlow',sans-serif;transition:border-color .2s;}
+  .field input:focus{outline:none;border-color:var(--accent);}
+  .btn-primary{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);
+    padding:13px;font-size:15px;font-weight:600;font-family:'Barlow',sans-serif;cursor:pointer;transition:background .2s,transform .1s;}
+  .btn-primary:hover{background:var(--accent2);} .btn-primary:active{transform:scale(.98);}
+  .login-error{margin-top:14px;background:rgba(248,81,73,.12);border:1px solid rgba(248,81,73,.3);border-radius:8px;
+    padding:10px 14px;font-size:13px;color:var(--red);display:none;}
+
+  /* ── APP ── */
+  #app{display:none;flex-direction:column;min-height:100vh;}
+  header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:64px;
+    display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .header-left{display:flex;align-items:center;gap:12px;}
+  .h-logo{width:36px;height:36px;background:var(--accent);border-radius:8px;display:grid;place-items:center;font-size:16px;}
+  .h-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;letter-spacing:.5px;}
+  .h-title span{color:var(--accent);}
+  .header-right{display:flex;align-items:center;gap:10px;}
+  .user-badge{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);
+    border-radius:8px;padding:6px 12px;font-size:13px;}
+  .role-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;}
+  .btn-logout{background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);
+    padding:6px 12px;font-size:13px;cursor:pointer;font-family:'Barlow',sans-serif;transition:color .2s,border-color .2s;}
+  .btn-logout:hover{color:var(--red);border-color:var(--red);}
+
+  /* ── LAYOUT ── */
+  .layout{display:flex;flex:1;}
+
+  /* ── SIDEBAR ── */
+  aside{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);
+    padding:20px 12px;display:flex;flex-direction:column;gap:2px;
+    position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto;}
+  .sidebar-label{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:1.2px;
+    text-transform:uppercase;padding:0 10px;margin:14px 0 6px;}
+  .sidebar-label:first-child{margin-top:0;}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;
+    font-size:13px;font-weight:500;color:var(--muted);transition:background .15s,color .15s;
+    border:none;background:transparent;width:100%;text-align:left;font-family:'Barlow',sans-serif;}
+  .nav-item:hover{background:var(--surface2);color:var(--text);}
+  .nav-item.active{background:rgba(249,115,22,.15);color:var(--accent);}
+  .nav-item .icon{font-size:15px;flex-shrink:0;}
+  .nav-count{margin-left:auto;background:var(--surface2);border-radius:20px;padding:1px 7px;
+    font-size:11px;color:var(--muted);font-weight:600;}
+  .nav-item.active .nav-count{background:rgba(249,115,22,.2);color:var(--accent);}
+  .divider{height:1px;background:var(--border);margin:8px 0;}
+
+  /* ── MAIN ── */
+  main{flex:1;padding:28px 32px;background:radial-gradient(ellipse 60% 40% at 100% 0%,rgba(249,115,22,.06) 0%,transparent 60%),var(--bg);min-height:calc(100vh - 64px);}
+
+  /* ── UPLOAD ZONE ── */
+  #uploadZone{background:var(--surface);border:2px dashed var(--border);border-radius:12px;padding:24px;margin-bottom:24px;display:none;transition:border-color .2s;}
+  #uploadZone.drag-over{border-color:var(--accent);background:rgba(249,115,22,.04);}
+  #uploadZone h3{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;margin-bottom:16px;}
+  .upload-form{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;}
+  .upload-form input[type="text"],.upload-form select{background:var(--surface2);border:1px solid var(--border);
+    border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:'Barlow',sans-serif;}
+  .upload-form input[type="text"]:focus,.upload-form select:focus{outline:none;border-color:var(--accent);}
+  .upload-form input[type="text"]{flex:1;min-width:200px;}
+  .file-drop-area{border:1.5px dashed var(--border);border-radius:8px;padding:9px 14px;cursor:pointer;
+    display:flex;align-items:center;gap:8px;background:var(--surface2);font-size:13px;color:var(--muted);
+    transition:border-color .2s;min-width:180px;}
+  .file-drop-area:hover{border-color:var(--accent);color:var(--text);}
+  .file-drop-area input[type="file"]{display:none;}
+  .btn-upload{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 18px;
+    font-size:13px;font-weight:600;font-family:'Barlow',sans-serif;cursor:pointer;transition:background .2s;white-space:nowrap;}
+  .btn-upload:hover{background:var(--accent2);} .btn-upload:disabled{opacity:.5;cursor:not-allowed;}
+  .upload-progress{margin-top:12px;display:none;}
+  .progress-bar-wrap{background:var(--surface2);border-radius:4px;height:5px;overflow:hidden;margin-top:5px;}
+  .progress-bar{height:100%;background:var(--accent);border-radius:4px;width:0%;transition:width .3s;}
+
+  /* ── FILTRES RAPIDES ── */
+  .filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
+  .search-wrap{position:relative;flex:1;min-width:180px;}
+  .search-wrap input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:9px 12px 9px 36px;color:var(--text);font-size:13px;font-family:'Barlow',sans-serif;transition:border-color .2s;}
+  .search-wrap input:focus{outline:none;border-color:var(--accent);}
+  .search-wrap::before{content:'🔍';position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none;}
+  .filter-select{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:9px 12px;color:var(--text);font-size:13px;font-family:'Barlow',sans-serif;cursor:pointer;}
+  .filter-select:focus{outline:none;border-color:var(--accent);}
+
+  /* ── PAGE HEADER ── */
+  .page-header{margin-bottom:20px;}
+  .page-title{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;letter-spacing:.5px;}
+  .page-sub{font-size:13px;color:var(--muted);margin-top:3px;}
+
+  /* ── STATS ── */
+  .stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-bottom:22px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;}
+  .stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
+  .stat-value{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;margin-top:3px;}
+
+  /* ── GRILLE ── */
+  #manualsGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;}
+  .manual-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;
+    transition:transform .2s,border-color .2s,box-shadow .2s;animation:fadeUp .3s ease;}
+  .manual-card:hover{transform:translateY(-3px);border-color:rgba(249,115,22,.4);box-shadow:0 10px 36px rgba(0,0,0,.3);}
+  .card-top{background:var(--surface2);padding:18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
+  .pdf-icon{width:40px;height:40px;background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);
+    border-radius:8px;display:grid;place-items:center;font-size:18px;flex-shrink:0;}
+  .card-meta{flex:1;min-width:0;}
+  .card-title{font-weight:600;font-size:13px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .card-date{font-size:11px;color:var(--muted);margin-top:2px;}
+  .card-body{padding:12px 14px;}
+  .card-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+  .tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;letter-spacing:.3px;}
+
+  /* Tags métier */
+  .tag-maintenance{background:rgba(88,166,255,.15);color:var(--blue);border:1px solid rgba(88,166,255,.25);}
+  .tag-operateur{background:rgba(63,185,80,.15);color:var(--green);border:1px solid rgba(63,185,80,.25);}
+  .tag-mecanicien{background:rgba(249,115,22,.15);color:var(--accent);border:1px solid rgba(249,115,22,.25);}
+  .tag-electrique{background:rgba(210,153,34,.15);color:var(--yellow);border:1px solid rgba(210,153,34,.25);}
+  .tag-general{background:rgba(125,133,144,.15);color:var(--muted);border:1px solid rgba(125,133,144,.25);}
+
+  /* Tags machine */
+  .tag-souffleuse{background:rgba(163,113,247,.15);color:var(--purple);border:1px solid rgba(163,113,247,.25);}
+  .tag-rinceuse{background:rgba(88,166,255,.15);color:#79c0ff;border:1px solid rgba(88,166,255,.25);}
+  .tag-soutireuse{background:rgba(63,185,80,.15);color:#56d364;border:1px solid rgba(63,185,80,.25);}
+  .tag-etiqueteuse{background:rgba(249,115,22,.15);color:var(--accent);border:1px solid rgba(249,115,22,.25);}
+  .tag-emballage{background:rgba(210,153,34,.15);color:var(--yellow);border:1px solid rgba(210,153,34,.25);}
+  .tag-palletizing{background:rgba(248,81,73,.15);color:var(--red);border:1px solid rgba(248,81,73,.25);}
+  .tag-general-machine{background:rgba(125,133,144,.15);color:var(--muted);border:1px solid rgba(125,133,144,.25);}
+
+  .card-actions{display:flex;gap:7px;}
+  .btn-view{flex:1;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.25);border-radius:7px;
+    color:var(--accent);padding:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Barlow',sans-serif;transition:background .2s;}
+  .btn-view:hover{background:rgba(249,115,22,.22);}
+  .btn-dl{background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--muted);
+    padding:7px 10px;font-size:13px;cursor:pointer;transition:color .2s,border-color .2s;text-decoration:none;display:flex;align-items:center;}
+  .btn-dl:hover{color:var(--text);border-color:var(--text);}
+  .btn-del{background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--muted);
+    padding:7px 9px;font-size:13px;cursor:pointer;transition:color .2s,border-color .2s;display:none;}
+  .btn-del:hover{color:var(--red);border-color:var(--red);}
+
+  /* ── EMPTY ── */
+  .empty-state{grid-column:1/-1;text-align:center;padding:70px 20px;color:var(--muted);}
+  .empty-state .es-icon{font-size:44px;margin-bottom:14px;}
+  .empty-state h3{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px;}
+  .empty-state p{font-size:13px;}
+
+  /* ── TOAST ── */
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border);
+    border-radius:10px;padding:12px 16px;font-size:13px;display:flex;align-items:center;gap:9px;
+    box-shadow:0 8px 32px rgba(0,0,0,.4);z-index:9999;transform:translateY(20px);opacity:0;
+    transition:transform .3s,opacity .3s;max-width:320px;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  .toast.success{border-color:rgba(63,185,80,.4);}
+  .toast.error{border-color:rgba(248,81,73,.4);}
+
+  /* ── MODAL PDF — supprimé, ouverture dans nouvel onglet ── */
+
+  /* ── LOADER ── */
+  .loader{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.2);
+    border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:5px;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ── AUTH LINKS ── */
+  .auth-links{display:flex;justify-content:space-between;align-items:center;margin-top:14px;}
+  .auth-link{background:none;border:none;color:var(--blue);font-size:13px;cursor:pointer;
+    font-family:'Barlow',sans-serif;padding:0;text-decoration:underline;opacity:.8;transition:opacity .2s;}
+  .auth-link:hover{opacity:1;}
+
+  /* ── MODAL OVERLAY ── */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;
+    align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal-box{background:#1c2330;border:1px solid #30363d;border-radius:14px;padding:36px 32px;
+    width:100%;max-width:400px;animation:fadeUp .3s ease;position:relative;}
+  .modal-box h2{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;margin-bottom:6px;}
+  .modal-box p{font-size:13px;color:#7d8590;margin-bottom:22px;}
+  .modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:#7d8590;
+    font-size:20px;cursor:pointer;line-height:1;}
+  .modal-close:hover{color:#e6edf3;}
+  .modal-error{margin-top:12px;background:rgba(248,81,73,.12);border:1px solid rgba(248,81,73,.3);
+    border-radius:8px;padding:10px 14px;font-size:13px;color:#f85149;display:none;}
+  .modal-success{margin-top:12px;background:rgba(63,185,80,.12);border:1px solid rgba(63,185,80,.3);
+    border-radius:8px;padding:10px 14px;font-size:13px;color:#3fb950;display:none;}
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:768px){
+    aside{display:none;}
+    main{padding:16px;}
+    .upload-form{flex-direction:column;}
+    header{padding:0 14px;}
+    .h-title{font-size:15px;}
+    .user-badge .email{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+
+  <!-- FOND SVG INLINE -->
+  <svg id="loginBg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900"
+       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;">
+    <defs>
+      <linearGradient id="gbg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1a2d42"/>
+        <stop offset="100%" stop-color="#0f1e2e"/>
+      </linearGradient>
+    </defs>
+    <!-- Fond bleu industriel -->
+    <rect width="1200" height="900" fill="url(#gbg)"/>
+
+    <!-- Grille -->
+    <g stroke="#4a90b8" stroke-width="1" opacity="0.18">
+      <line x1="0" y1="100" x2="1200" y2="100"/><line x1="0" y1="200" x2="1200" y2="200"/>
+      <line x1="0" y1="300" x2="1200" y2="300"/><line x1="0" y1="400" x2="1200" y2="400"/>
+      <line x1="0" y1="500" x2="1200" y2="500"/><line x1="0" y1="600" x2="1200" y2="600"/>
+      <line x1="0" y1="700" x2="1200" y2="700"/><line x1="0" y1="800" x2="1200" y2="800"/>
+      <line x1="100" y1="0" x2="100" y2="900"/><line x1="200" y1="0" x2="200" y2="900"/>
+      <line x1="300" y1="0" x2="300" y2="900"/><line x1="400" y1="0" x2="400" y2="900"/>
+      <line x1="500" y1="0" x2="500" y2="900"/><line x1="600" y1="0" x2="600" y2="900"/>
+      <line x1="700" y1="0" x2="700" y2="900"/><line x1="800" y1="0" x2="800" y2="900"/>
+      <line x1="900" y1="0" x2="900" y2="900"/><line x1="1000" y1="0" x2="1000" y2="900"/>
+      <line x1="1100" y1="0" x2="1100" y2="900"/>
+    </g>
+
+    <!-- ===== SOUFFLEUSE gauche ===== -->
+    <g transform="translate(40,100)" opacity="0.85">
+      <rect x="0" y="80" width="185" height="275" rx="8" fill="#2a3f58" stroke="#5a8ab0" stroke-width="2"/>
+      <rect x="14" y="98" width="157" height="88" rx="6" fill="#0f1e2e" stroke="#f97316" stroke-width="2.5"/>
+      <circle cx="44" cy="126" r="13" fill="#f97316"/><circle cx="44" cy="126" r="6" fill="#ffb347"/>
+      <circle cx="80" cy="126" r="10" fill="#1a2d42" stroke="#7ec8e3" stroke-width="2"/>
+      <circle cx="116" cy="126" r="10" fill="#1a2d42" stroke="#7ec8e3" stroke-width="2"/>
+      <circle cx="152" cy="126" r="10" fill="#1a2d42" stroke="#3fb950" stroke-width="2"/>
+      <rect x="28" y="152" width="129" height="8" rx="4" fill="#1a2d42" stroke="#7ec8e3" stroke-width="1"/>
+      <rect x="28" y="168" width="90" height="8" rx="4" fill="#f97316"/>
+      <!-- Moules -->
+      <rect x="18" y="200" width="64" height="105" rx="32" fill="#1a2d42" stroke="#7ec8e3" stroke-width="2"/>
+      <rect x="103" y="200" width="64" height="105" rx="32" fill="#1a2d42" stroke="#7ec8e3" stroke-width="2"/>
+      <!-- Préforme -->
+      <ellipse cx="92" cy="252" rx="15" ry="38" fill="#f97316" opacity="0.9"/>
+      <rect x="76" y="305" width="10" height="50" rx="5" fill="#3a5570" stroke="#7ec8e3" stroke-width="1"/>
+      <!-- Socle -->
+      <rect x="-12" y="352" width="210" height="22" rx="5" fill="#2a3f58" stroke="#5a8ab0" stroke-width="1"/>
+      <text x="92" y="398" text-anchor="middle" font-family="Arial" font-size="14" fill="#f97316" font-weight="bold" letter-spacing="2">SOUFFLEUSE</text>
+    </g>
+
+    <!-- ===== RINCEUSE centre-gauche ===== -->
+    <g transform="translate(230,40)" opacity="0.8">
+      <circle cx="140" cy="250" r="185" fill="none" stroke="#5a8ab0" stroke-width="3"/>
+      <circle cx="140" cy="250" r="162" fill="none" stroke="#7ec8e3" stroke-width="1.5" stroke-dasharray="14,9"/>
+      <circle cx="140" cy="250" r="44" fill="#2a3f58" stroke="#f97316" stroke-width="3"/>
+      <circle cx="140" cy="250" r="20" fill="#0f1e2e" stroke="#f97316" stroke-width="2"/>
+      <g><line x1="140" y1="250" x2="300" y2="138" stroke="#3a5570" stroke-width="5"/>
+        <circle cx="303" cy="135" r="12" fill="#7ec8e3"/><circle cx="303" cy="135" r="5" fill="#0f1e2e"/></g>
+      <g transform="rotate(45,140,250)"><line x1="140" y1="250" x2="300" y2="138" stroke="#3a5570" stroke-width="5"/>
+        <circle cx="303" cy="135" r="12" fill="#7ec8e3"/><circle cx="303" cy="135" r="5" fill="#0f1e2e"/></g>
+      <g transform="rotate(90,140,250)"><line x1="140" y1="250" x2="300" y2="138" stroke="#3a5570" stroke-width="5"/>
+        <circle cx="303" cy="135" r="12" fill="#7ec8e3"/><circle cx="303" cy="135" r="5" fill="#0f1e2e"/></g>
+      <g transform="rotate(135,140,250)"><line x1="140" y1="250" x2="300" y2="138" stroke="#3a5570" stroke-width="5"/>
+        <circle cx="303" cy="135" r="12" fill="#7ec8e3"/><circle cx="303" cy="135" r="5" fill="#0f1e2e"/></g>
+      <g transform="rotate(180,140,250)"><line x1="140" y1="250" x2="300" y2="138" stroke="#3a5570" stroke-width="5"/>
+        <circle cx="303" cy="135" r="12" fill="#7ec8e3"/><circle cx="303" cy="135" r="5" fill="#0f1e2e"/></g>
+      <g transform="rotate(225,140,250)"><line x1="140" y1="250" x2="300" y2="138" stroke="#3a5570" stroke-width="5"/>
+        <circle cx="303" cy="135" r="12" fill="#7ec8e3"/><circle cx="303" cy="135" r="5" fill="#0f1e2e"/></g>
+      <g transform="rotate(270,140,250)"><line x1="140" y1="250" x2="300" y2="138" stroke="#3a5570" stroke-width="5"/>
+        <circle cx="303" cy="135" r="12" fill="#7ec8e3"/><circle cx="303" cy="135" r="5" fill="#0f1e2e"/></g>
+      <g transform="rotate(315,140,250)"><line x1="140" y1="250" x2="300" y2="138" stroke="#3a5570" stroke-width="5"/>
+        <circle cx="303" cy="135" r="12" fill="#7ec8e3"/><circle cx="303" cy="135" r="5" fill="#0f1e2e"/></g>
+      <text x="140" y="468" text-anchor="middle" font-family="Arial" font-size="14" fill="#7ec8e3" font-weight="bold" letter-spacing="2">RINCEUSE</text>
+    </g>
+
+    <!-- ===== SOUTIREUSE centre-droit ===== -->
+    <g transform="translate(700,30)" opacity="0.75">
+      <circle cx="130" cy="260" r="190" fill="none" stroke="#5a8ab0" stroke-width="3"/>
+      <circle cx="130" cy="260" r="168" fill="none" stroke="#3fb950" stroke-width="1.5" stroke-dasharray="16,10"/>
+      <circle cx="130" cy="260" r="46" fill="#2a3f58" stroke="#f97316" stroke-width="3"/>
+      <circle cx="130" cy="260" r="21" fill="#0f1e2e" stroke="#f97316" stroke-width="2"/>
+      <g><line x1="130" y1="260" x2="295" y2="152" stroke="#3a5570" stroke-width="5"/>
+        <rect x="284" y="118" width="22" height="38" rx="5" fill="#3fb950"/>
+        <rect x="290" y="110" width="10" height="13" rx="2" fill="#5a8ab0"/></g>
+      <g transform="rotate(36,130,260)"><line x1="130" y1="260" x2="295" y2="152" stroke="#3a5570" stroke-width="5"/>
+        <rect x="284" y="118" width="22" height="38" rx="5" fill="#3fb950"/>
+        <rect x="290" y="110" width="10" height="13" rx="2" fill="#5a8ab0"/></g>
+      <g transform="rotate(72,130,260)"><line x1="130" y1="260" x2="295" y2="152" stroke="#3a5570" stroke-width="5"/>
+        <rect x="284" y="118" width="22" height="38" rx="5" fill="#3fb950"/>
+        <rect x="290" y="110" width="10" height="13" rx="2" fill="#5a8ab0"/></g>
+      <g transform="rotate(108,130,260)"><line x1="130" y1="260" x2="295" y2="152" stroke="#3a5570" stroke-width="5"/>
+        <rect x="284" y="118" width="22" height="38" rx="5" fill="#3fb950"/>
+        <rect x="290" y="110" width="10" height="13" rx="2" fill="#5a8ab0"/></g>
+      <g transform="rotate(144,130,260)"><line x1="130" y1="260" x2="295" y2="152" stroke="#3a5570" stroke-width="5"/>
+        <rect x="284" y="118" width="22" height="38" rx="5" fill="#3fb950"/>
+        <rect x="290" y="110" width="10" height="13" rx="2" fill="#5a8ab0"/></g>
+      <g transform="rotate(180,130,260)"><line x1="130" y1="260" x2="295" y2="152" stroke="#3a5570" stroke-width="5"/>
+        <rect x="284" y="118" width="22" height="38" rx="5" fill="#3fb950"/>
+        <rect x="290" y="110" width="10" height="13" rx="2" fill="#5a8ab0"/></g>
+      <g transform="rotate(216,130,260)"><line x1="130" y1="260" x2="295" y2="152" stroke="#3a5570" stroke-width="5"/>
+        <rect x="284" y="118" width="22" height="38" rx="5" fill="#3fb950"/>
+        <rect x="290" y="110" width="10" height="13" rx="2" fill="#5a8ab0"/></g>
+      <g transform="rotate(252,130,260)"><line x1="130" y1="260" x2="295" y2="152" stroke="#3a5570" stroke-width="5"/>
+        <rect x="284" y="118" width="22" height="38" rx="5" fill="#3fb950"/>
+        <rect x="290" y="110" width="10" height="13" rx="2" fill="#5a8ab0"/></g>
+      <g transform="rotate(288,130,260)"><line x1="130" y1="260" x2="295" y2="152" stroke="#3a5570" stroke-width="5"/>
+        <rect x="284" y="118" width="22" height="38" rx="5" fill="#3fb950"/>
+        <rect x="290" y="110" width="10" height="13" rx="2" fill="#5a8ab0"/></g>
+      <g transform="rotate(324,130,260)"><line x1="130" y1="260" x2="295" y2="152" stroke="#3a5570" stroke-width="5"/>
+        <rect x="284" y="118" width="22" height="38" rx="5" fill="#3fb950"/>
+        <rect x="290" y="110" width="10" height="13" rx="2" fill="#5a8ab0"/></g>
+      <text x="130" y="480" text-anchor="middle" font-family="Arial" font-size="14" fill="#3fb950" font-weight="bold" letter-spacing="2">SOUTIREUSE</text>
+    </g>
+
+    <!-- ===== EMBALLAGE droite ===== -->
+    <g transform="translate(1005,90)" opacity="0.82">
+      <rect x="0" y="60" width="178" height="290" rx="8" fill="#2a3f58" stroke="#5a8ab0" stroke-width="2"/>
+      <rect x="14" y="80" width="150" height="82" rx="6" fill="#0f1e2e" stroke="#d2a122" stroke-width="2.5"/>
+      <circle cx="42" cy="110" r="12" fill="#d2a122"/><circle cx="42" cy="110" r="5" fill="#ffe066"/>
+      <circle cx="78" cy="110" r="10" fill="#1a2d42" stroke="#f97316" stroke-width="2"/>
+      <circle cx="114" cy="110" r="10" fill="#1a2d42" stroke="#7ec8e3" stroke-width="2"/>
+      <rect x="28" y="132" width="122" height="8" rx="4" fill="#d2a122" opacity="0.8"/>
+      <rect x="28" y="148" width="78" height="8" rx="4" fill="#1a2d42" stroke="#7ec8e3" stroke-width="1"/>
+      <!-- Convoyeur -->
+      <rect x="10" y="188" width="158" height="20" rx="5" fill="#1a2d42" stroke="#d2a122" stroke-width="2"/>
+      <circle cx="26" cy="198" r="10" fill="#0f1e2e" stroke="#d2a122" stroke-width="2"/>
+      <circle cx="152" cy="198" r="10" fill="#0f1e2e" stroke="#d2a122" stroke-width="2"/>
+      <!-- Bouteilles -->
+      <ellipse cx="52" cy="174" rx="9" ry="22" fill="#7ec8e3" opacity="0.8"/>
+      <ellipse cx="78" cy="174" rx="9" ry="22" fill="#7ec8e3" opacity="0.8"/>
+      <ellipse cx="104" cy="174" rx="9" ry="22" fill="#7ec8e3" opacity="0.8"/>
+      <ellipse cx="130" cy="174" rx="9" ry="22" fill="#7ec8e3" opacity="0.8"/>
+      <!-- Bras -->
+      <rect x="54" y="220" width="72" height="90" rx="6" fill="#1a2d42" stroke="#d2a122" stroke-width="2"/>
+      <rect x="64" y="230" width="52" height="70" rx="3" fill="#0f1e2e"/>
+      <line x1="90" y1="210" x2="90" y2="222" stroke="#d2a122" stroke-width="4"/>
+      <rect x="-12" y="348" width="202" height="22" rx="5" fill="#2a3f58" stroke="#5a8ab0" stroke-width="1"/>
+      <text x="89" y="394" text-anchor="middle" font-family="Arial" font-size="14" fill="#d2a122" font-weight="bold" letter-spacing="2">EMBALLAGE</text>
+    </g>
+
+    <!-- ===== CLÉ À MOLETTE ===== -->
+    <g transform="translate(575,580) rotate(-28)" opacity="0.6">
+      <rect x="-8" y="-140" width="16" height="240" rx="7" fill="#3a5570"/>
+      <ellipse cx="0" cy="-140" rx="28" ry="22" fill="none" stroke="#5a8ab0" stroke-width="11"/>
+      <rect x="-10" y="-158" width="10" height="24" rx="3" fill="#3a5570"/>
+      <text x="0" y="115" text-anchor="middle" font-family="Arial" font-size="11" fill="#7ec8e3" font-weight="bold">CLÉ</text>
+    </g>
+
+    <!-- ===== TOURNEVIS ===== -->
+    <g transform="translate(155,665) rotate(14)" opacity="0.55">
+      <rect x="-6" y="-175" width="12" height="255" rx="5" fill="#3a5570"/>
+      <rect x="-16" y="-175" width="32" height="70" rx="7" fill="#f97316" opacity="0.85"/>
+      <rect x="-3" y="80" width="6" height="38" fill="#3a5570"/>
+      <text x="0" y="130" text-anchor="middle" font-family="Arial" font-size="11" fill="#f97316" font-weight="bold">TOURNEVIS</text>
+    </g>
+
+    <!-- ===== CLÉ PLATE ===== -->
+    <g transform="translate(1095,650) rotate(-14)" opacity="0.55">
+      <rect x="-7" y="-155" width="14" height="270" rx="6" fill="#3a5570"/>
+      <rect x="-22" y="-155" width="44" height="26" rx="5" fill="none" stroke="#5a8ab0" stroke-width="9"/>
+      <rect x="-19" y="108" width="38" height="22" rx="5" fill="none" stroke="#5a8ab0" stroke-width="9"/>
+      <text x="0" y="148" text-anchor="middle" font-family="Arial" font-size="11" fill="#7ec8e3" font-weight="bold">CLÉ PLATE</text>
+    </g>
+
+    <!-- ===== BOUTEILLES EAU VITALE ===== -->
+    <g transform="translate(870,760)" opacity="0.65">
+      <ellipse cx="0"  cy="0" rx="20" ry="54" fill="none" stroke="#7ec8e3" stroke-width="2.5"/>
+      <ellipse cx="48" cy="0" rx="20" ry="54" fill="none" stroke="#7ec8e3" stroke-width="2.5"/>
+      <ellipse cx="96" cy="0" rx="20" ry="54" fill="none" stroke="#7ec8e3" stroke-width="2.5"/>
+      <rect x="-22" y="-56" width="140" height="8" rx="4" fill="#3a5570"/>
+    </g>
+
+    <!-- ===== ENGRENAGES ===== -->
+    <g transform="translate(490,775)" opacity="0.5">
+      <circle cx="0" cy="0" r="58" fill="none" stroke="#3a5570" stroke-width="15" stroke-dasharray="30,12"/>
+      <circle cx="0" cy="0" r="28" fill="#2a3f58" stroke="#5a8ab0" stroke-width="4"/>
+      <circle cx="0" cy="0" r="10" fill="#0f1e2e"/>
+    </g>
+    <g transform="translate(595,805)" opacity="0.42">
+      <circle cx="0" cy="0" r="40" fill="none" stroke="#3a5570" stroke-width="10" stroke-dasharray="20,8"/>
+      <circle cx="0" cy="0" r="18" fill="#2a3f58" stroke="#5a8ab0" stroke-width="3"/>
+    </g>
+
+    <!-- SIDEL watermark -->
+    <text x="600" y="868" text-anchor="middle" font-family="Arial" font-size="42" font-weight="bold" fill="#f97316" opacity="0.22" letter-spacing="14">SIDEL</text>
+  </svg>
+
+  <!-- CARTE CONNEXION TRANSPARENTE -->
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">🏭</div>
+      <div class="logo-text"><h1>AP INDUSTRIE</h1><span>Eau Vitale — Manuels</span></div>
+    </div>
+    <div class="login-title">Connexion</div>
+    <p class="login-sub">Accédez à la bibliothèque des manuels techniques.</p>
+    <div class="field"><label>Adresse e-mail</label><input type="email" id="loginEmail" placeholder="exemple@apindustrie.com" autocomplete="email"/></div>
+    <div class="field"><label>Mot de passe</label><input type="password" id="loginPass" placeholder="••••••••"/></div>
+    <button class="btn-primary" id="btnLogin">Se connecter</button>
+    <div class="login-error" id="loginError"></div>
+    <div class="auth-links">
+      <button class="auth-link" onclick="document.getElementById('modalRegister').classList.add('open')">Créer un compte</button>
+      <button class="auth-link" onclick="document.getElementById('modalReset').classList.add('open')">Mot de passe oublié ?</button>
+    </div>
+    <div style="margin-top:28px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.1);text-align:center;">
+      <div style="font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Développé par</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;letter-spacing:2px;color:rgba(255,255,255,0.55);">
+        <span style="color:#f97316;">AET</span> &middot; ALBAN ELOH TECHNOLOGY
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL INSCRIPTION -->
+<div class="modal-overlay" id="modalRegister">
+  <div class="modal-box">
+    <button class="modal-close" onclick="document.getElementById('modalRegister').classList.remove('open')">&times;</button>
+    <h2>Créer un compte</h2>
+    <p>Renseignez vos informations pour accéder à la bibliothèque.</p>
+    <div class="field"><label>Adresse e-mail</label><input type="email" id="regEmail" placeholder="exemple@apindustrie.com"/></div>
+    <div class="field"><label>Mot de passe</label><input type="password" id="regPass" placeholder="6 caractères minimum"/></div>
+    <div class="field"><label>Confirmer le mot de passe</label><input type="password" id="regPass2" placeholder="••••••••"/></div>
+    <button class="btn-primary" id="btnRegister">Créer le compte</button>
+    <div class="modal-error" id="regError"></div>
+    <div class="modal-success" id="regSuccess"></div>
+  </div>
+</div>
+
+<!-- MODAL MOT DE PASSE OUBLIÉ -->
+<div class="modal-overlay" id="modalReset">
+  <div class="modal-box">
+    <button class="modal-close" onclick="document.getElementById('modalReset').classList.remove('open')">&times;</button>
+    <h2>Mot de passe oublié</h2>
+    <p>Entrez votre adresse e-mail pour recevoir un lien de réinitialisation.</p>
+    <div class="field"><label>Adresse e-mail</label><input type="email" id="resetEmail" placeholder="exemple@apindustrie.com"/></div>
+    <button class="btn-primary" id="btnReset">Envoyer le lien</button>
+    <div class="modal-error" id="resetError"></div>
+    <div class="modal-success" id="resetSuccess"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="header-left">
+      <div class="h-logo">🏭</div>
+      <div class="h-title">AP <span>INDUSTRIE</span> — Bibliothèque</div>
+    </div>
+    <div class="header-right">
+      <div class="user-badge">
+        <div class="role-dot" id="roleDot"></div>
+        <span class="email" id="userEmail"></span>
+        <span id="userRoleLabel" style="font-weight:600;color:var(--accent)"></span>
+      </div>
+      <button class="btn-logout" id="btnLogout">Déconnexion</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- SIDEBAR -->
+    <aside>
+      <div class="sidebar-label">Vue générale</div>
+      <button class="nav-item active" data-filter="all" data-type="all" onclick="navClick(this)">
+        <span class="icon">📚</span> Tous les manuels
+        <span class="nav-count" id="cnt-all">0</span>
+      </button>
+
+      <div class="divider"></div>
+      <div class="sidebar-label">Par métier</div>
+      <button class="nav-item" data-filter="maintenance" data-type="metier" onclick="navClick(this)">
+        <span class="icon">🔧</span> Maintenance <span class="nav-count" id="cnt-maintenance">0</span>
+      </button>
+      <button class="nav-item" data-filter="operateur" data-type="metier" onclick="navClick(this)">
+        <span class="icon">⚙️</span> Opérateurs <span class="nav-count" id="cnt-operateur">0</span>
+      </button>
+      <button class="nav-item" data-filter="mecanicien" data-type="metier" onclick="navClick(this)">
+        <span class="icon">🪛</span> Mécaniciens <span class="nav-count" id="cnt-mecanicien">0</span>
+      </button>
+      <button class="nav-item" data-filter="electrique" data-type="metier" onclick="navClick(this)">
+        <span class="icon">⚡</span> Électrique <span class="nav-count" id="cnt-electrique">0</span>
+      </button>
+      <button class="nav-item" data-filter="general" data-type="metier" onclick="navClick(this)">
+        <span class="icon">📄</span> Général <span class="nav-count" id="cnt-general">0</span>
+      </button>
+
+      <div class="divider"></div>
+      <div class="sidebar-label">Par machine</div>
+      <button class="nav-item" data-filter="souffleuse" data-type="machine" onclick="navClick(this)">
+        <span class="icon">💨</span> Souffleuse <span class="nav-count" id="cnt-souffleuse">0</span>
+      </button>
+      <button class="nav-item" data-filter="rinceuse" data-type="machine" onclick="navClick(this)">
+        <span class="icon">🚿</span> Rinceuse <span class="nav-count" id="cnt-rinceuse">0</span>
+      </button>
+      <button class="nav-item" data-filter="soutireuse" data-type="machine" onclick="navClick(this)">
+        <span class="icon">🍶</span> Soutireuse <span class="nav-count" id="cnt-soutireuse">0</span>
+      </button>
+      <button class="nav-item" data-filter="etiqueteuse" data-type="machine" onclick="navClick(this)">
+        <span class="icon">🏷️</span> Étiqueteuse <span class="nav-count" id="cnt-etiqueteuse">0</span>
+      </button>
+      <button class="nav-item" data-filter="emballage" data-type="machine" onclick="navClick(this)">
+        <span class="icon">📦</span> Emballage <span class="nav-count" id="cnt-emballage">0</span>
+      </button>
+      <button class="nav-item" data-filter="palletizing" data-type="machine" onclick="navClick(this)">
+        <span class="icon">🏗️</span> Palletizing <span class="nav-count" id="cnt-palletizing">0</span>
+      </button>
+    </aside>
+
+    <!-- MAIN -->
+    <main>
+      <!-- UPLOAD (admin) -->
+      <div id="uploadZone">
+        <h3>📤 Ajouter un manuel</h3>
+        <div class="upload-form">
+          <input type="text" id="upTitle" placeholder="Titre du manuel (ex: PDR Soutireuse Sidel)"/>
+          <select id="upMetier">
+            <option value="">-- Métier --</option>
+            <option value="maintenance">🔧 Maintenance</option>
+            <option value="operateur">⚙️ Opérateurs</option>
+            <option value="mecanicien">🪛 Mécaniciens</option>
+            <option value="electrique">⚡ Électrique</option>
+            <option value="general">📄 Général</option>
+          </select>
+          <select id="upMachine">
+            <option value="">-- Machine --</option>
+            <option value="souffleuse">💨 Souffleuse</option>
+            <option value="rinceuse">🚿 Rinceuse</option>
+            <option value="soutireuse">🍶 Soutireuse</option>
+            <option value="etiqueteuse">🏷️ Étiqueteuse</option>
+            <option value="emballage">📦 Emballage</option>
+            <option value="palletizing">🏗️ Palletizing</option>
+          </select>
+          <label class="file-drop-area" id="fileLabel">
+            <span>📎</span><span id="fileName">Cliquer ou glisser un fichier…</span>
+            <input type="file" id="upFile" accept=".pdf,.doc,.docx,.xlsx,.png,.jpg"/>
+          </label>
+          <button class="btn-upload" id="btnUpload" onclick="uploadManual()">Publier</button>
+        </div>
+        <div class="upload-progress" id="upProgress">
+          <div style="font-size:12px;color:var(--muted)" id="upProgressText">Envoi…</div>
+          <div class="progress-bar-wrap"><div class="progress-bar" id="upBar"></div></div>
+        </div>
+      </div>
+
+      <!-- PAGE HEADER -->
+      <div class="page-header">
+        <div class="page-title" id="pageTitle">Tous les manuels</div>
+        <div class="page-sub" id="pageSub">Consultez et téléchargez les documents techniques AP Industrie.</div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value" id="statTotal" style="color:var(--accent)">—</div></div>
+        <div class="stat-card"><div class="stat-label">Maintenance</div><div class="stat-value" id="statMaint" style="color:var(--blue)">—</div></div>
+        <div class="stat-card"><div class="stat-label">Opérateurs</div><div class="stat-value" id="statOp" style="color:var(--green)">—</div></div>
+        <div class="stat-card"><div class="stat-label">Mécaniciens</div><div class="stat-value" id="statMeca" style="color:var(--accent2)">—</div></div>
+        <div class="stat-card"><div class="stat-label">Machines</div><div class="stat-value" id="statMachines" style="color:var(--purple)">6</div></div>
+      </div>
+
+      <!-- FILTRES RAPIDES -->
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <input type="text" id="searchInput" placeholder="Rechercher un manuel, code pièce…" oninput="renderManuals()"/>
+        </div>
+        <select class="filter-select" id="sortSelect" onchange="renderManuals()">
+          <option value="newest">Plus récents</option>
+          <option value="oldest">Plus anciens</option>
+          <option value="az">A → Z</option>
+        </select>
+        <!-- Filtre croisé métier (visible quand on est dans une machine) -->
+        <select class="filter-select" id="crossMetier" onchange="renderManuals()">
+          <option value="">Tous métiers</option>
+          <option value="maintenance">Maintenance</option>
+          <option value="operateur">Opérateurs</option>
+          <option value="mecanicien">Mécaniciens</option>
+          <option value="electrique">Électrique</option>
+          <option value="general">Général</option>
+        </select>
+        <!-- Filtre croisé machine (visible quand on est dans un métier) -->
+        <select class="filter-select" id="crossMachine" onchange="renderManuals()">
+          <option value="">Toutes machines</option>
+          <option value="souffleuse">Souffleuse</option>
+          <option value="rinceuse">Rinceuse</option>
+          <option value="soutireuse">Soutireuse</option>
+          <option value="etiqueteuse">Étiqueteuse</option>
+          <option value="emballage">Emballage</option>
+          <option value="palletizing">Palletizing</option>
+        </select>
+      </div>
+
+      <!-- GRILLE -->
+      <div id="manualsGrid"></div>
+    </main>
+  </div>
+</div>
+
+<!-- PDF ouvert dans un nouvel onglet directement -->
+
+<!-- FOOTER AET -->
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:14px 32px;display:none;align-items:center;justify-content:center;gap:10px;" id="appFooter">
+  <span style="font-size:11px;color:var(--muted);letter-spacing:.5px;">Bibliothèque des Manuels Techniques — AP Industrie</span>
+  <span style="color:var(--border);font-size:11px;">|</span>
+  <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:1.5px;color:var(--muted);">
+    <span style="color:#f97316;">AET</span> &middot; ALBAN ELOH TECHNOLOGY
+  </span>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp }        from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged }
+                                from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, onSnapshot }
+                                from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL, deleteObject }
+                                from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+/* ══ CONFIG FIREBASE ══ */
+const firebaseConfig = {
+  apiKey:            "AIzaSyAMUbDnQ1-miMDgTFuJZ2TURpU-2faAiKU",
+  authDomain:        "technicien-ap.firebaseapp.com",
+  databaseURL:       "https://technicien-ap-default-rtdb.firebaseio.com",
+  projectId:         "technicien-ap",
+  storageBucket:     "technicien-ap.firebasestorage.app",
+  messagingSenderId: "301407137425",
+  appId:             "1:301407137425:web:0254a5a261b2c11e8a1930"
+};
+
+/* ══ EMAILS ADMIN ══ */
+const ADMIN_EMAILS = [
+  "albaneloh686@gmail.com",
+];
+
+const fbApp   = initializeApp(firebaseConfig);
+const auth    = getAuth(fbApp);
+const db      = getFirestore(fbApp);
+const storage = getStorage(fbApp);
+
+let allManuals   = [];
+let activeFilter = "all";   // valeur du filtre actif
+let activeType   = "all";   // "all" | "metier" | "machine"
+let currentUser  = null;
+let isAdmin      = false;
+
+/* ── Expose globals ── */
+window.navClick      = navClick;
+window.uploadManual  = uploadManual;
+window.closeModal    = closeModal;
+window.renderManuals = renderManuals;
+window.openPdf       = openPdf;
+window.deleteManual  = deleteManual;
+
+/* ══ AUTH ══ */
+document.getElementById("btnLogin").onclick = async () => {
+  const email = document.getElementById("loginEmail").value.trim();
+  const pass  = document.getElementById("loginPass").value;
+  const btn   = document.getElementById("btnLogin");
+  const err   = document.getElementById("loginError");
+  err.style.display = "none";
+  btn.innerHTML = '<span class="loader"></span>Connexion…';
+  btn.disabled  = true;
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    err.textContent = "Email ou mot de passe incorrect.";
+    err.style.display = "block";
+    btn.innerHTML = "Se connecter";
+    btn.disabled  = false;
+  }
+};
+document.getElementById("loginPass").addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("btnLogin").click();
+});
+document.getElementById("btnLogout").onclick = () => signOut(auth);
+
+/* ══ INSCRIPTION ══ */
+document.getElementById("btnRegister").onclick = async () => {
+  const email = document.getElementById("regEmail").value.trim();
+  const pass  = document.getElementById("regPass").value;
+  const pass2 = document.getElementById("regPass2").value;
+  const err   = document.getElementById("regError");
+  const ok    = document.getElementById("regSuccess");
+  const btn   = document.getElementById("btnRegister");
+  err.style.display = "none"; ok.style.display = "none";
+
+  if (!email || !pass) { err.textContent = "Remplissez tous les champs."; err.style.display = "block"; return; }
+  if (pass.length < 6) { err.textContent = "Le mot de passe doit faire au moins 6 caractères."; err.style.display = "block"; return; }
+  if (pass !== pass2)  { err.textContent = "Les mots de passe ne correspondent pas."; err.style.display = "block"; return; }
+
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span>Création…';
+  try {
+    await createUserWithEmailAndPassword(auth, email, pass);
+    ok.textContent = "✅ Compte créé ! Vous êtes maintenant connecté.";
+    ok.style.display = "block";
+    btn.innerHTML = "Créer le compte"; btn.disabled = false;
+    setTimeout(() => document.getElementById("modalRegister").classList.remove("open"), 1800);
+  } catch(e) {
+    const msgs = {
+      "auth/email-already-in-use": "Cet email est déjà utilisé.",
+      "auth/invalid-email": "Adresse e-mail invalide.",
+      "auth/weak-password": "Mot de passe trop faible."
+    };
+    err.textContent = msgs[e.code] || e.message;
+    err.style.display = "block";
+    btn.innerHTML = "Créer le compte"; btn.disabled = false;
+  }
+};
+
+/* ══ MOT DE PASSE OUBLIÉ ══ */
+document.getElementById("btnReset").onclick = async () => {
+  const email = document.getElementById("resetEmail").value.trim();
+  const err   = document.getElementById("resetError");
+  const ok    = document.getElementById("resetSuccess");
+  const btn   = document.getElementById("btnReset");
+  err.style.display = "none"; ok.style.display = "none";
+
+  if (!email) { err.textContent = "Entrez votre adresse e-mail."; err.style.display = "block"; return; }
+
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span>Envoi…';
+  try {
+    await sendPasswordResetEmail(auth, email);
+    ok.textContent = "✅ Lien envoyé ! Vérifiez votre boîte mail.";
+    ok.style.display = "block";
+    btn.innerHTML = "Envoyer le lien"; btn.disabled = false;
+  } catch(e) {
+    const msgs = {
+      "auth/user-not-found": "Aucun compte associé à cet email.",
+      "auth/invalid-email": "Adresse e-mail invalide."
+    };
+    err.textContent = msgs[e.code] || e.message;
+    err.style.display = "block";
+    btn.innerHTML = "Envoyer le lien"; btn.disabled = false;
+  }
+};
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    currentUser = user;
+    isAdmin = ADMIN_EMAILS.includes(user.email.toLowerCase());
+    showApp();
+  } else {
+    currentUser = null; isAdmin = false;
+    showLogin();
+  }
+});
+
+function showApp() {
+  document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("app").style.display = "flex";
+  document.getElementById("appFooter").style.display = "flex";
+  document.getElementById("userEmail").textContent    = currentUser.email;
+  document.getElementById("userRoleLabel").textContent = isAdmin ? "Admin" : "Lecteur";
+  if (isAdmin) {
+    document.getElementById("uploadZone").style.display = "block";
+    document.querySelectorAll(".btn-del").forEach(b => b.style.display = "");
+  }
+  loadManuals();
+}
+function showLogin() {
+  document.getElementById("app").style.display        = "none";
+  document.getElementById("appFooter").style.display  = "none";
+  document.getElementById("loginScreen").style.display = "flex";
+  document.getElementById("btnLogin").innerHTML = "Se connecter";
+  document.getElementById("btnLogin").disabled  = false;
+  document.getElementById("loginError").style.display = "none";
+}
+
+/* ══ FIRESTORE ══ */
+function loadManuals() {
+  const q = query(collection(db, "manuals"), orderBy("createdAt","desc"));
+  onSnapshot(q, snap => {
+    allManuals = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    updateCounts();
+    renderManuals();
+  });
+}
+
+/* ══ UPLOAD ══ */
+async function uploadManual() {
+  const title   = document.getElementById("upTitle").value.trim();
+  const metier  = document.getElementById("upMetier").value;
+  const machine = document.getElementById("upMachine").value;
+  const file    = document.getElementById("upFile").files[0];
+  const btn     = document.getElementById("btnUpload");
+
+  if (!title)   { showToast("⚠️ Saisissez un titre.",  "error"); return; }
+  if (!metier)  { showToast("⚠️ Choisissez un métier.", "error"); return; }
+  if (!machine) { showToast("⚠️ Choisissez une machine.","error"); return; }
+  if (!file)    { showToast("⚠️ Sélectionnez un fichier.", "error"); return; }
+
+  btn.disabled  = true;
+  btn.innerHTML = '<span class="loader"></span>Envoi…';
+  const prog    = document.getElementById("upProgress");
+  const bar     = document.getElementById("upBar");
+  const progTxt = document.getElementById("upProgressText");
+  prog.style.display = "block";
+
+  try {
+    const storageRef = sRef(storage, `manuals/${Date.now()}_${file.name}`);
+    const task       = uploadBytesResumable(storageRef, file);
+    task.on("state_changed",
+      snap => {
+        const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
+        bar.style.width = pct + "%";
+        progTxt.textContent = `Envoi… ${pct}%`;
+      },
+      err => { showToast("❌ " + err.message,"error"); resetBtn(btn); },
+      async () => {
+        const url = await getDownloadURL(task.snapshot.ref);
+        await addDoc(collection(db, "manuals"), {
+          title, metier, machine,
+          fileName: file.name, fileType: file.type, fileSize: file.size,
+          url, storagePath: task.snapshot.ref.fullPath,
+          uploadedBy: currentUser.email, createdAt: new Date()
+        });
+        showToast("✅ Manuel publié !", "success");
+        document.getElementById("upTitle").value  = "";
+        document.getElementById("upMetier").value = "";
+        document.getElementById("upMachine").value= "";
+        document.getElementById("upFile").value   = "";
+        document.getElementById("fileName").textContent = "Cliquer ou glisser un fichier…";
+        resetBtn(btn);
+        prog.style.display = "none"; bar.style.width = "0%";
+      }
+    );
+  } catch(e) { showToast("❌ " + e.message,"error"); resetBtn(btn); }
+}
+function resetBtn(btn) { btn.disabled = false; btn.innerHTML = "Publier"; }
+
+/* ══ SUPPRESSION ══ */
+async function deleteManual(id, storagePath, e) {
+  e.stopPropagation();
+  if (!confirm("Supprimer ce manuel définitivement ?")) return;
+  try {
+    await deleteDoc(doc(db, "manuals", id));
+    if (storagePath) { try { await deleteObject(sRef(storage, storagePath)); } catch(_){} }
+    showToast("🗑️ Manuel supprimé.", "success");
+  } catch(e) { showToast("❌ " + e.message,"error"); }
+}
+
+/* ══ NAVIGATION SIDEBAR ══ */
+function navClick(btn) {
+  activeFilter = btn.dataset.filter;
+  activeType   = btn.dataset.type;
+  document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+
+  const titles = {
+    all:"Tous les manuels",
+    maintenance:"Maintenance",operateur:"Opérateurs",mecanicien:"Mécaniciens",
+    electrique:"Électrique",general:"Général",
+    souffleuse:"Souffleuse",rinceuse:"Rinceuse",soutireuse:"Soutireuse",
+    etiqueteuse:"Étiqueteuse",emballage:"Emballage",palletizing:"Palletizing"
+  };
+  const subs = {
+    all:"Tous les documents techniques AP Industrie.",
+    maintenance:"Manuels destinés aux maintenanciers.",
+    operateur:"Manuels destinés aux opérateurs.",
+    mecanicien:"Manuels destinés aux mécaniciens.",
+    electrique:"Documentation électrique.",
+    general:"Documents généraux.",
+    souffleuse:"Documentation de la Souffleuse.",
+    rinceuse:"Documentation de la Rinceuse.",
+    soutireuse:"Documentation de la Soutireuse.",
+    etiqueteuse:"Documentation de l'Étiqueteuse.",
+    emballage:"Documentation de la machine d'Emballage.",
+    palletizing:"Documentation du Palletizing."
+  };
+  document.getElementById("pageTitle").textContent = titles[activeFilter] || "Manuels";
+  document.getElementById("pageSub").textContent   = subs[activeFilter] || "";
+
+  // reset filtres croisés
+  document.getElementById("crossMetier").value  = "";
+  document.getElementById("crossMachine").value = "";
+  renderManuals();
+}
+
+/* ══ RENDU ══ */
+function renderManuals() {
+  const search      = document.getElementById("searchInput").value.toLowerCase();
+  const sort        = document.getElementById("sortSelect").value;
+  const crossM      = document.getElementById("crossMetier").value;
+  const crossMach   = document.getElementById("crossMachine").value;
+
+  let list = allManuals.filter(m => {
+    // filtre principal sidebar
+    let ok = true;
+    if (activeType === "metier")   ok = m.metier   === activeFilter;
+    if (activeType === "machine")  ok = m.machine  === activeFilter;
+
+    // filtres croisés
+    if (crossM    && m.metier   !== crossM)    ok = false;
+    if (crossMach && m.machine  !== crossMach) ok = false;
+
+    // recherche texte
+    const s = search;
+    if (s && !m.title.toLowerCase().includes(s) && !(m.fileName||"").toLowerCase().includes(s)) ok = false;
+
+    return ok;
+  });
+
+  if (sort === "oldest") list.sort((a,b) => toDate(a.createdAt) - toDate(b.createdAt));
+  else if (sort === "az") list.sort((a,b) => a.title.localeCompare(b.title));
+
+  const grid = document.getElementById("manualsGrid");
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="es-icon">📂</div><h3>Aucun manuel trouvé</h3><p>Modifiez votre recherche ou ajoutez un manuel.</p></div>`;
+    return;
+  }
+  grid.innerHTML = list.map(m => cardHTML(m)).join("");
+}
+
+/* ══ CARD HTML ══ */
+function cardHTML(m) {
+  const metierLabel  = {maintenance:"Maintenance",operateur:"Opérateur",mecanicien:"Mécanicien",electrique:"Électrique",general:"Général"}[m.metier]  || m.metier  || "—";
+  const machineLabel = {souffleuse:"Souffleuse",rinceuse:"Rinceuse",soutireuse:"Soutireuse",etiqueteuse:"Étiqueteuse",emballage:"Emballage",palletizing:"Palletizing"}[m.machine] || m.machine || "—";
+  const metierClass  = "tag-" + (m.metier  || "general");
+  const machineClass = "tag-" + (m.machine || "general-machine");
+  const dateStr      = m.createdAt ? new Date(toDate(m.createdAt)).toLocaleDateString("fr-FR") : "—";
+  const sizeStr      = m.fileSize  ? formatSize(m.fileSize) : "";
+  const isPdf        = (m.fileType||"").includes("pdf") || (m.fileName||"").endsWith(".pdf");
+  const icon         = isPdf ? "📕" : "📄";
+  const safeTitle    = escHtml(m.title);
+  const delBtn       = isAdmin ? `<button class="btn-del" onclick="deleteManual('${m.id}','${m.storagePath||''}',event)" title="Supprimer">🗑️</button>` : "";
+
+  return `
+  <div class="manual-card" onclick="openPdf('${m.url}')">
+    <div class="card-top">
+      <div class="pdf-icon">${icon}</div>
+      <div class="card-meta">
+        <div class="card-title" title="${safeTitle}">${safeTitle}</div>
+        <div class="card-date">📅 ${dateStr}${sizeStr ? " · " + sizeStr : ""}</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-tags">
+        <span class="tag ${metierClass}">${metierLabel}</span>
+        <span class="tag ${machineClass}">${machineLabel}</span>
+      </div>
+      <div class="card-actions">
+        <button class="btn-view" onclick="openPdf('${m.url}');event.stopPropagation()">👁 Consulter</button>
+        <a class="btn-dl" href="${m.url}" download target="_blank" onclick="event.stopPropagation()" title="Télécharger">⬇️</a>
+        ${delBtn}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ══ COUNTS ══ */
+function updateCounts() {
+  const metiers  = ["maintenance","operateur","mecanicien","electrique","general"];
+  const machines = ["souffleuse","rinceuse","soutireuse","etiqueteuse","emballage","palletizing"];
+  metiers.forEach(c  => { const el=document.getElementById("cnt-"+c);  if(el) el.textContent = allManuals.filter(m=>m.metier===c).length; });
+  machines.forEach(c => { const el=document.getElementById("cnt-"+c);  if(el) el.textContent = allManuals.filter(m=>m.machine===c).length; });
+  document.getElementById("cnt-all").textContent   = allManuals.length;
+  document.getElementById("statTotal").textContent = allManuals.length;
+  document.getElementById("statMaint").textContent = allManuals.filter(m=>m.metier==="maintenance").length;
+  document.getElementById("statOp").textContent    = allManuals.filter(m=>m.metier==="operateur").length;
+  document.getElementById("statMeca").textContent  = allManuals.filter(m=>m.metier==="mecanicien").length;
+}
+
+/* ══ PDF — nouvel onglet ══ */
+function openPdf(url) {
+  window.open(url, "_blank");
+}
+function closeModal() {}
+
+/* ══ FILE INPUT ══ */
+document.getElementById("upFile").addEventListener("change", function() {
+  const f = this.files[0];
+  document.getElementById("fileName").textContent = f ? f.name : "Cliquer ou glisser un fichier…";
+});
+
+/* ══ DRAG & DROP ══ */
+const uz = document.getElementById("uploadZone");
+uz.addEventListener("dragover",  e => { e.preventDefault(); uz.classList.add("drag-over"); });
+uz.addEventListener("dragleave", () => uz.classList.remove("drag-over"));
+uz.addEventListener("drop", e => {
+  e.preventDefault(); uz.classList.remove("drag-over");
+  const f = e.dataTransfer.files[0];
+  if (f) {
+    const dt = new DataTransfer(); dt.items.add(f);
+    document.getElementById("upFile").files = dt.files;
+    document.getElementById("fileName").textContent = f.name;
+  }
+});
+
+/* ══ UTILS ══ */
+function toDate(v) { if (!v) return 0; if (v.toDate) return v.toDate(); return new Date(v); }
+function formatSize(b) { if(b<1024) return b+"B"; if(b<1048576) return (b/1024).toFixed(1)+"KB"; return (b/1048576).toFixed(1)+"MB"; }
+function escHtml(s) { return String(s||"").replace(/'/g,"&#39;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function showToast(msg, type="success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.className = "toast " + type;
+  void t.offsetWidth; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 3500);
+}
+</script>
+</body>
+</html>
