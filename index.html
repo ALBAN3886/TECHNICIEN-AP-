@@ -19,7 +19,6 @@
 
   /* ── LOGIN ── */
   #loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;position:relative;overflow:hidden;background:transparent;}
-    position:relative;overflow:hidden;background:#1a2332;}
   .login-card{background:transparent;border:none;border-radius:16px;padding:48px 40px 40px;
     width:100%;max-width:420px;box-shadow:none;animation:fadeUp .5s ease;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
@@ -258,7 +257,7 @@
 
   <!-- FOND SVG INLINE -->
   <svg id="loginBg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900"
-       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;">
+       style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;display:block;">
     <defs>
       <linearGradient id="gbg" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0%" stop-color="#1a2d42"/>
@@ -477,6 +476,10 @@
     <button class="btn-primary" id="btnRegister">Créer le compte</button>
     <div class="modal-error" id="regError"></div>
     <div class="modal-success" id="regSuccess"></div>
+    <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--muted);">
+      Déjà un compte ? 
+      <button class="auth-link" onclick="document.getElementById('modalRegister').classList.remove('open')">Se connecter</button>
+    </div>
   </div>
 </div>
 
@@ -805,9 +808,19 @@ document.getElementById("btnReset").onclick = async () => {
   } catch(e) {
     const msgs = {
       "auth/user-not-found": "Aucun compte associé à cet email.",
-      "auth/invalid-email": "Adresse e-mail invalide."
+      "auth/invalid-email": "Adresse e-mail invalide.",
+      "auth/missing-android-pkg-name": "Erreur de configuration. Contactez l'administrateur.",
+      "auth/missing-continue-uri": "Erreur de configuration. Contactez l'administrateur.",
+      "auth/missing-ios-bundle-id": "Erreur de configuration. Contactez l'administrateur.",
+      "auth/invalid-continue-uri": "Erreur de configuration. Contactez l'administrateur.",
+      "auth/unauthorized-continue-uri": "Ce domaine n'est pas autorisé. Contactez l'administrateur.",
+      "auth/too-many-requests": "Trop de tentatives. Réessayez dans quelques minutes."
     };
-    err.textContent = msgs[e.code] || e.message;
+    // Erreur -26 = domaine non autorisé dans Firebase Console
+    const msg = msgs[e.code] || (e.message && e.message.includes("-26")
+      ? "Domaine non autorisé. L'administrateur doit ajouter ce domaine dans Firebase Console → Authentication → Authorized domains."
+      : (e.message || "Une erreur est survenue. Réessayez."));
+    err.textContent = msg;
     err.style.display = "block";
     btn.innerHTML = "Envoyer le lien"; btn.disabled = false;
   }
