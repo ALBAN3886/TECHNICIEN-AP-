@@ -717,35 +717,33 @@ const auth    = getAuth(fbApp);
 const db      = getFirestore(fbApp);
 // Supabase config
 const SUPABASE_URL    = "https://toqyosgjmvwhqmmhyjyv.supabase.co";
-const SUPABASE_ANON   = "sb_publishable_twLnbzktfpTOMZg20v26pQ_iITV40Vw";
+const SUPABASE_KEY    = "sb_publishable_1wLnbzktfpTOMZg20v26pQ_iITV40Vw";
 const SUPABASE_BUCKET = "Manuel";
-async function uploadToSupabase(file, onProgress) {
-  // Upload via Supabase Storage REST API (XMLHttpRequest pour la progression)
-  return new Promise((resolve, reject) => {
-    const path = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
-    const url  = `${SUPABASE_URL}/storage/v1/object/${SUPABASE_BUCKET}/${path}`;
-    const xhr  = new XMLHttpRequest();
-    xhr.open("POST", url);
-    xhr.setRequestHeader("Authorization", "Bearer " + SUPABASE_ANON);
-    xhr.setRequestHeader("x-upsert", "true");
-    xhr.upload.onprogress = e => { if (e.lengthComputable) onProgress(Math.round(e.loaded/e.total*100)); };
-    xhr.onload = () => {
-      if (xhr.status === 200 || xhr.status === 201) {
-        const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${SUPABASE_BUCKET}/${path}`;
-        resolve({ url: publicUrl, path });
-      } else {
-        reject(new Error("Supabase Storage: " + xhr.status + " " + xhr.responseText));
-      }
-    };
-    xhr.onerror = () => reject(new Error("Erreur réseau lors de l'upload."));
-    xhr.send(file);
-  });
+
+// Init Supabase client via CDN
+let _supabase = null;
+async function getSupabase() {
+  if (_supabase) return _supabase;
+  const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+  _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+  return _supabase;
 }
+
+async function uploadToSupabase(file, onProgress) {
+  const sb   = await getSupabase();
+  const path = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+  onProgress(10);
+  const { data, error } = await sb.storage.from(SUPABASE_BUCKET).upload(path, file, { upsert: true });
+  if (error) throw new Error("Supabase Storage: " + error.message);
+  onProgress(90);
+  const { data: { publicUrl } } = sb.storage.from(SUPABASE_BUCKET).getPublicUrl(path);
+  onProgress(100);
+  return { url: publicUrl, path };
+}
+
 async function deleteFromSupabase(path) {
-  await fetch(`${SUPABASE_URL}/storage/v1/object/${SUPABASE_BUCKET}/${path}`, {
-    method: "DELETE",
-    headers: { "Authorization": "Bearer " + SUPABASE_ANON }
-  });
+  const sb = await getSupabase();
+  await sb.storage.from(SUPABASE_BUCKET).remove([path]);
 }
 
 let allManuals   = [];
