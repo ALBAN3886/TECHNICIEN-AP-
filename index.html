@@ -1046,7 +1046,7 @@ function cardHTML(m) {
   const delBtn       = isAdmin ? `<button class="btn-del" onclick="deleteManual('${m.id}','${m.storagePath||''}',event)" title="Supprimer">🗑️</button>` : "";
 
   return `
-  <div class="manual-card" onclick="openPdf('${m.url}')">
+  <div class="manual-card" onclick="openPdf('${m.url}','${m.title}')">
     <div class="card-top">
       <div class="pdf-icon">${icon}</div>
       <div class="card-meta">
@@ -1060,8 +1060,8 @@ function cardHTML(m) {
         <span class="tag ${machineClass}">${machineLabel}</span>
       </div>
       <div class="card-actions">
-        <button class="btn-view" onclick="openPdf('${m.url}');event.stopPropagation()">👁 Consulter</button>
-        <a class="btn-dl" href="${m.url}" download target="_blank" onclick="event.stopPropagation()" title="Télécharger">⬇️</a>
+        <button class="btn-view" onclick="openPdf('${m.url}','${m.title}');event.stopPropagation()">👁 Consulter</button>
+
         ${delBtn}
       </div>
     </div>
@@ -1081,11 +1081,18 @@ function updateCounts() {
   document.getElementById("statMeca").textContent  = allManuals.filter(m=>m.metier==="mecanicien").length;
 }
 
-/* ══ PDF — nouvel onglet ══ */
-function openPdf(url) {
-  window.open(url, "_blank");
+/* ══ PDF VIEWER MODAL ══ */
+function openPdf(url, title) {
+  document.getElementById("pdfModalTitle").textContent = title || "Manuel";
+  document.getElementById("pdfFrame").src = url;
+  document.getElementById("pdfModal").style.display = "flex";
+  document.body.style.overflow = "hidden";
 }
-function closeModal() {}
+function closeModal() {
+  document.getElementById("pdfModal").style.display = "none";
+  document.getElementById("pdfFrame").src = "";
+  document.body.style.overflow = "";
+}
 
 /* ══ FILE INPUT & DRAG DROP MODERNES ══ */
 
@@ -1135,5 +1142,14 @@ function showToast(msg, type="success") {
   setTimeout(() => t.classList.remove("show"), 3500);
 }
 </script>
+
+<!-- ══ PDF VIEWER MODAL ══ -->
+<div id="pdfModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.92);flex-direction:column;">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#161b22;border-bottom:1px solid #30363d;flex-shrink:0;">
+    <span id="pdfModalTitle" style="color:#e6edf3;font-weight:600;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70vw;"></span>
+    <button onclick="closeModal()" style="background:#f85149;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:13px;cursor:pointer;font-weight:600;">✕ Fermer</button>
+  </div>
+  <iframe id="pdfFrame" src="" style="flex:1;width:100%;border:none;background:#fff;" allowfullscreen></iframe>
+</div>
 </body>
 </html>
