@@ -1084,7 +1084,9 @@ function updateCounts() {
 /* ══ PDF VIEWER MODAL ══ */
 function openPdf(url, title) {
   document.getElementById("pdfModalTitle").textContent = title || "Manuel";
-  document.getElementById("pdfFrame").src = url;
+  // Google Docs Viewer — affiche le PDF sans permettre le téléchargement direct
+  const viewerUrl = "https://docs.google.com/viewer?embedded=true&url=" + encodeURIComponent(url);
+  document.getElementById("pdfFrame").src = viewerUrl;
   document.getElementById("pdfModal").style.display = "flex";
   document.body.style.overflow = "hidden";
 }
