@@ -1112,14 +1112,17 @@ async function pdfRenderAll() {
   container.innerHTML = "";
   const total = pdfDoc.numPages;
   document.getElementById("pdfPageInfo").textContent = "1 / " + total;
+  const dpr = window.devicePixelRatio || 1; // Ratio écran haute densité
 
   for (let i = 1; i <= total; i++) {
     const page = await pdfDoc.getPage(i);
-    const viewport = page.getViewport({ scale: Math.min(window.innerWidth - 20, 800) / page.getViewport({ scale: 1 }).width });
+    const baseScale = Math.min(window.innerWidth - 20, 800) / page.getViewport({ scale: 1 }).width;
+    const viewport = page.getViewport({ scale: baseScale * dpr }); // Haute résolution
     const canvas = document.createElement("canvas");
     canvas.width = viewport.width;
     canvas.height = viewport.height;
-    canvas.style.cssText = "display:block;max-width:100%;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.5);";
+    // Afficher à taille normale mais rendu haute résolution
+    canvas.style.cssText = `display:block;width:${viewport.width / dpr}px;height:${viewport.height / dpr}px;max-width:100%;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.5);`;
     container.appendChild(canvas);
     await page.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
   }
