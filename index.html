@@ -1094,14 +1094,30 @@ async function openPdf(url, title) {
   if (!window.pdfjsLib) {
     const script = document.createElement("script");
     script.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
-    await new Promise(r => { script.onload = r; document.head.appendChild(script); });
-    window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    await new Promise((resolve, reject) => {
+      script.onload = resolve;
+      script.onerror = () => reject(new Error("Impossible de charger pdf.js (pas de réseau ?)"));
+      document.head.appendChild(script);
+    });
+    // Pas de Worker séparé : en WebView Android, le Worker pdf.js échoue souvent
+    // silencieusement (CSP / restrictions internes) et le rendu reste bloqué à l'infini.
+    // On force le rendu sur le thread principal pour que ça marche à coup sûr.
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = "";
   }
 
+  // Sécurité : si le chargement traîne plus de 15s (Worker bloqué, réseau lent...),
+  // on affiche une erreur au lieu de laisser l'écran gris indéfiniment.
+  const timeout = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("Délai dépassé (15s). Vérifiez votre connexion.")), 15000)
+  );
+
   try {
-    pdfDoc = await window.pdfjsLib.getDocument({ url, withCredentials: false }).promise;
+    pdfDoc = await Promise.race([
+      window.pdfjsLib.getDocument({ url, withCredentials: false, disableWorker: true }).promise,
+      timeout
+    ]);
     pdfCurrentPage = 1;
-    await pdfRenderAll();
+    await Promise.race([pdfRenderAll(), timeout]);
   } catch(e) {
     document.getElementById("pdfContainer").innerHTML = '<div style="color:#f85149;margin-top:40px;text-align:center;padding:20px;">❌ Impossible de charger le PDF.<br><small>' + e.message + '</small></div>';
   }
